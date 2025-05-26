@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  # creationTimestamp: "2025-05-27T12:00:00Z"
+  # resourceVersion: "123456"
+  # uid: "fe88e486-e646-4d2c-b386-61fc2af46454"
+  name: frontend-config
+  namespace: default
+data:
+  journalEntries: "10"

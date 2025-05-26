@@ -28,5 +28,12 @@ spec:
           limits:
             cpu: "1.0"
             memory: "1G"
+        env:
+        - name: JOURNAL_ENTRIES
+          valueFrom:
+            configMapKeyRef:
+              # 버전 번호를 넣는것이 좋다
+              name: frontend-config
+              key: journalEntries
       dnsPolicy: ClusterFirst
       restartPolicy: Always
