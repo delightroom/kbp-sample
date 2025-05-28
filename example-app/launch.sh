@@ -1,10 +1,9 @@
 #! /bin/bash
 
-PASSOWRD=$(cat /etc/redis-passwd/redis-passwd)
+PASSWORD=$(cat /etc/redis-passwd/redis-passwd)
 
 if [[ "${HOSTNAME}" == "redis-0" ]]; then
-redis-server --requirepass $PASSOWRD
+redis-server --requirepass $PASSWORD
 else
-redis-server --slaveof redis-0 6379 --masterauth $PASSOWRD
-   --requirepass $PASSOWRD
+redis-server --slaveof redis-0 6379 --masterauth $PASSWORD --requirepass $PASSWORD
 fi
