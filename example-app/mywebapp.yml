@@ -1,0 +1,43 @@
+# deployment는 apps/v1 버전이어야 함
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mywebapp
+  namespace: myapp-prod
+spec:
+  # selector, template 둘 다 있어야 함
+  selector:
+    matchLabels:
+      app: mywebapp
+  template:
+    metadata:
+      labels:
+        app: mywebapp
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx
+            - name: api-key
+              mountPath: /usr/var/nginx/html/keys
+          resources:
+            requests:
+              cpu: "1.0"
+              memory: "512Mi"
+            limits:
+              cpu: "1.0"
+              memory: "512Mi"
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-http-config
+            items:
+              - key: config
+                path: nginx.conf
+        - name: api-key
+          secret:
+            secretName: myapp-api-key
