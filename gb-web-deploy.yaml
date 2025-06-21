@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gb-web-deploy
+  labels:
+    app: guest-book
+    appver: 1.6.9
+    environment: production
+    release: guest-book-stable
+    release-number: 34e57f01
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 3
+      maxSurge: 2
+  selector:
+    matchLabels:
+      app: gb-web
+      ver: 1.5.8
+    matchExpressions:
+      - key: environment
+        operator: In
+        values:
+          - production
+  template:
+    metadata:
+      labels:
+        app: gb-web
+        ver: 1.5.8
+        environment: production
+    spec:
+      containers:
+        - name: gb-web-cont
+          image: nginx
+          env:
+            - name: GB_DB_HOST
+              value: gb-mysql
+            - name: GB_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pass
+                  key: password
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 80

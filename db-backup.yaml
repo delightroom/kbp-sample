@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-backup
+  labels:
+    app: guest-book
+    appver: 1.6.9
+    environment: production
+    release: guest-book-stable
+    release-number: 34e57f01
+  annotations:
+    "helm.sh/hook": pre-upgrade
+    "helm.sh/hook": pre-delete
+    "helm.sh/hook": pre-rollback
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      labels:
+        app: gb-db-backup
+        tier: backend
+        ver: 1.6.1
+        environment: production
+    spec:
+      containers:
+        - name: mysqldump
+          image: evilgenius/mysqldump:v1
+          env:
+            - name: DB_NAME
+              value: gbdb1
+            - name: GB_DB_HOST
+              value: gb-mysql
+            - name: GB_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pass
+                  key: password
+          volumeMounts:
+            - name: mysqldump
+              mountPath: /mysqldump
+      volumes:
+        - name: mysqldump
+          hostPath:
+            path: /home/bck/mysqldump
+      restartPolicy: Never
+      backoffLimit: 3

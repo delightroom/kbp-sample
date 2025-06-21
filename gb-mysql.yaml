@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gb-mysql
+  labels:
+    app: guest-book
+    appver: 1.6.9
+    environment: production
+    release: guest-book-stable
+    release-number: 34e57f01
+spec:
+  selector:
+    matchLabels:
+      app: gb-db
+  template:
+    metadata:
+      labels:
+        app: gb-db
+        tier: backend
+        ver: 1.5.9
+        environment: production
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-pass
+                  key: password
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: mysql-persistent-storage
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: mysql-pv-claim
